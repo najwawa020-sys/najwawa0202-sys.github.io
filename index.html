@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7a8d8">
+  <title>Jadwal Pelajaran | MA Persi 38 Padalarang</title>
+  <style>
+    :root {
+      --pink: #f7a8d8;
+      --pink-dark: #e96ab5;
+      --pink-soft: #fff0f8;
+      --blue: #9bdcff;
+      --blue-dark: #419bd0;
+      --blue-soft: #edf9ff;
+      --ink: #3e3a58;
+      --muted: #77748d;
+      --white: #fff;
+      --shadow: 0 12px 30px rgba(91, 102, 151, .12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 8% 8%, #ffd9ef 0 8%, transparent 26%),
+        radial-gradient(circle at 95% 20%, #d6f2ff 0 10%, transparent 29%),
+        linear-gradient(135deg, #fff8fc, #f4fbff 60%, #fff7fb);
+      min-height: 100vh;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .wrap { max-width: 1180px; margin: auto; padding: 22px; }
+    header {
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+      padding: 28px; border: 2px solid rgba(255,255,255,.85); border-radius: 28px;
+      background: linear-gradient(120deg, rgba(255,220,241,.96), rgba(216,242,255,.96));
+      box-shadow: var(--shadow);
+    }
+    header::after { content: "✦  ♡  ✿"; position: absolute; right: 20px; top: 12px; font-size: 25px; color: #fff; letter-spacing: 10px; opacity: .9; }
+    .brand { display: flex; align-items: center; gap: 16px; z-index: 1; }
+    .logo {
+      width: 74px; height: 74px; flex: 0 0 74px; display: grid; place-items: center;
+      background: white; border-radius: 24px; font-size: 37px;
+      box-shadow: 0 8px 18px #dca9d566; transform: rotate(-4deg);
+    }
+    h1 { margin: 0; font-size: clamp(23px, 4vw, 36px); line-height: 1.12; letter-spacing: -.8px; }
+    .subtitle { margin: 8px 0 0; color: #655d80; font-weight: 600; }
+    .header-tag { z-index: 1; background: #fff; color: var(--pink-dark); padding: 11px 15px; border-radius: 999px; font-weight: 800; white-space: nowrap; box-shadow: 0 5px 12px #d9a9c744; }
+    .welcome { display:flex; justify-content:space-between; align-items:center; gap:12px; margin: 24px 2px 15px; }
+    .welcome h2 { margin:0; font-size:22px; }
+    .welcome p { margin:5px 0 0; color:var(--muted); }
+    .date-pill { background:#fff; border:1px solid #f4d8ea; padding:10px 14px; border-radius:14px; font-weight:700; color:#746b91; }
+    .toolbar { display:flex; flex-wrap:wrap; gap:10px; margin: 16px 0; }
+    .control { min-height:44px; border:1px solid #e8e1f2; border-radius:14px; padding:10px 13px; color:var(--ink); background:#fff; outline-color:var(--pink-dark); }
+    .search { flex:1 1 220px; }
+    .btn { border:0; border-radius:14px; padding:11px 16px; font-weight:800; transition:transform .15s, box-shadow .15s; }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 7px 14px #bba8cc44; }
+    .btn-pink { background:var(--pink); color:#71305c; }
+    .btn-blue { background:var(--blue); color:#205d7c; }
+    .btn-white { background:#fff; color:var(--ink); border:1px solid #e8e1f2; }
+    .days { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:18px 0; }
+    .day-btn { border:2px solid transparent; border-radius:17px; padding:13px 8px; background:#fff; color:#6d6886; font-weight:800; box-shadow:0 5px 14px #a8b6d51a; }
+    .day-btn small { display:block; margin-top:4px; font-weight:600; opacity:.75; }
+    .day-btn.active { background:linear-gradient(135deg,#ffd8ef,#d7f1ff); border-color:#fff; color:#4f426f; box-shadow:0 0 0 2px #efb4dc; }
+    .panel { background:rgba(255,255,255,.88); border:1px solid #fff; border-radius:24px; box-shadow:var(--shadow); overflow:hidden; }
+    .panel-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:20px 22px; background:linear-gradient(100deg,#fff0f8,#eef9ff); }
+    .panel-head h3 { margin:0; font-size:20px; }
+    .panel-head p { margin:5px 0 0; color:var(--muted); font-size:14px; }
+    .count { border-radius:999px; background:#fff; padding:8px 12px; font-size:13px; font-weight:800; color:var(--blue-dark); }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:650px; }
+    th,td { padding:15px 17px; text-align:left; border-bottom:1px solid #f0edf6; }
+    th { color:#827c9a; background:#fff; font-size:12px; text-transform:uppercase; letter-spacing:.8px; }
+    tbody tr:hover { background:#fff8fc; }
+    tbody tr:last-child td { border-bottom:0; }
+    .time { font-weight:800; color:#6b6387; white-space:nowrap; }
+    .subject { display:flex; align-items:center; gap:10px; font-weight:800; }
+    .subject-icon { width:37px; height:37px; display:grid; place-items:center; border-radius:12px; background:var(--pink-soft); font-size:19px; }
+    tbody tr:nth-child(even) .subject-icon { background:var(--blue-soft); }
+    .class-tag { display:inline-block; border-radius:10px; background:#edf8ff; color:#3488b7; padding:6px 9px; font-weight:800; font-size:12px; }
+    .empty { text-align:center; padding:38px 15px; color:var(--muted); }
+    .below { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:18px; }
+    .note { padding:20px; }
+    .note h3 { margin:0 0 8px; font-size:17px; }
+    .note p { color:var(--muted); margin:0; line-height:1.6; font-size:14px; }
+    .note-pink { background:linear-gradient(135deg,#fff,#fff0f8); }
+    .note-blue { background:linear-gradient(135deg,#fff,#eef9ff); }
+    footer { text-align:center; padding:24px 8px 8px; color:#89849e; font-size:13px; }
+    .modal-backdrop { position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:18px; background:#332b4d66; z-index:5; }
+    .modal-backdrop.show { display:flex; }
+    .modal { width:min(520px,100%); max-height:90vh; overflow:auto; background:#fff; border-radius:24px; padding:24px; box-shadow:0 20px 60px #332b4d44; }
+    .modal h2 { margin:0 0 7px; }
+    .modal > p { color:var(--muted); font-size:14px; margin:0 0 18px; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field.full { grid-column:1/-1; }
+    .field label { font-size:13px; font-weight:800; color:#77708e; }
+    .field input,.field select { width:100%; border:1px solid #e6deef; border-radius:12px; padding:11px; min-width:0; }
+    .modal-actions { display:flex; gap:9px; justify-content:flex-end; margin-top:20px; }
+    .toast { position:fixed; left:50%; bottom:22px; transform:translate(-50%,20px); opacity:0; pointer-events:none; padding:12px 18px; border-radius:14px; background:#3e3a58; color:white; box-shadow:var(--shadow); transition:.2s; z-index:8; text-align:center; }
+    .toast.show { opacity:1; transform:translate(-50%,0); }
+    @media(max-width:700px) {
+      .wrap { padding:13px; }
+      header { padding:20px 17px; align-items:flex-start; }
+      .logo { width:55px; height:55px; flex-basis:55px; border-radius:17px; font-size:29px; }
+      .brand { gap:12px; }
+      .header-tag { display:none; }
+      .subtitle { font-size:13px; }
+      .welcome { align-items:flex-start; flex-direction:column; }
+      .days { gap:6px; }
+      .day-btn { padding:11px 3px; font-size:13px; }
+      .day-btn small { font-size:10px; }
+      .below { grid-template-columns:1fr; }
+      .panel-head { padding:17px; }
+      .form-grid { grid-template-columns:1fr; }
+      .field.full { grid-column:auto; }
+    }
+    @media print {
+      body { background:white; }
+      .wrap { max-width:none; padding:0; }
+      header,.panel,.note { box-shadow:none; }
+      .toolbar,.below,footer,.header-tag { display:none!important; }
+      .days { break-inside:avoid; }
+      .panel { border:1px solid #ddd; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">🎀</div>
+        <div>
+          <h1>Jadwal Pelajaran</h1>
+          <p class="subtitle">MA PERSI 38 PADALARANG · Belajar jadi seru! 🩵</p>
+        </div>
+      </div>
+      <div class="header-tag">♡ Study planner ♡</div>
+    </header>
+
+    <section class="welcome">
+      <div>
+        <h2>Hai, pejuang ilmu! 🌷</h2>
+        <p>Hari ini waktunya tumbuh, belajar, dan bersinar.</p>
+      </div>
+      <div class="date-pill" id="todayDate">📅 Memuat tanggal…</div>
+    </section>
+
+    <div class="toolbar">
+      <input class="control search" id="searchInput" type="search" placeholder="🔎 Cari mata pelajaran, guru, atau kelas…">
+      <select class="control" id="classFilter" aria-label="Pilih kelas">
+        <option value="">Semua kelas</option>
+        <option value="X">Kelas X</option>
+        <option value="XI">Kelas XI</option>
+        <option value="XII">Kelas XII</option>
+      </select>
+      <button class="btn btn-pink" id="addBtn">＋ Tambah jadwal</button>
+      <button class="btn btn-blue" id="printBtn">🖨️ Cetak jadwal</button>
+      <button class="btn btn-white" id="resetBtn">↻ Reset contoh</button>
+    </div>
+
+    <nav class="days" aria-label="Pilih hari" id="dayTabs">
+      <button class="day-btn active" data-day="Senin">🌸 Senin<small>Monday</small></button>
+      <button class="day-btn" data-day="Selasa">🫧 Selasa<small>Tuesday</small></button>
+      <button class="day-btn" data-day="Rabu">🌈 Rabu<small>Wednesday</small></button>
+      <button class="day-btn" data-day="Kamis">🦋 Kamis<small>Thursday</small></button>
+      <button class="day-btn" data-day="Jumat">☁️ Jumat<small>Friday</small></button>
+    </nav>
+
+    <main class="panel">
+      <div class="panel-head">
+        <div>
+          <h3 id="selectedDayTitle">🌸 Jadwal Hari Senin</h3>
+          <p>Atur jadwalmu, lalu jalani hari dengan penuh semangat!</p>
+        </div>
+        <span class="count" id="scheduleCount">0 pelajaran</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Waktu</th><th>Mata pelajaran</th><th>Guru</th><th>Kelas</th><th>Aksi</th></tr></thead>
+          <tbody id="scheduleBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="emptyState" hidden>
+        <div style="font-size:40px">🧸</div>
+        <strong>Belum ada jadwal yang cocok.</strong>
+        <p>Coba kata kunci lain atau tambahkan jadwal baru, ya!</p>
+      </div>
+    </main>
+
+    <section class="below">
+      <article class="panel note note-pink">
+        <h3>💗 Tips belajar hari ini</h3>
+        <p>Siapkan buku sebelum pelajaran dimulai, catat hal penting, dan jangan lupa istirahat serta minum air putih.</p>
+      </article>
+      <article class="panel note note-blue">
+        <h3>🩵 Catatan kecil</h3>
+        <p>Jadwal bawaan adalah <strong>contoh yang bisa diedit</strong>, bukan jadwal resmi sekolah. Sesuaikan dengan informasi dari guru atau sekolah.</p>
+      </article>
+    </section>
+    <footer>Made with ♡ untuk keluarga besar MA PERSI 38 Padalarang · Data jadwal tersimpan di browser ini.</footer>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <form class="modal" id="scheduleForm">
+      <h2 id="modalTitle">✨ Tambah jadwal</h2>
+      <p>Isi detail pelajaranmu di bawah ini.</p>
+      <div class="form-grid">
+        <div class="field">
+          <label for="day">Hari</label>
+          <select id="day" required>
+            <option>Senin</option><option>Selasa</option><option>Rabu</option><option>Kamis</option><option>Jumat</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="className">Kelas</label>
+          <select id="className" required>
+            <option value="X">X</option><option value="XI">XI</option><option value="XII">XII</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="startTime">Mulai</label>
+          <input id="startTime" type="time" value="07:00" required>
+        </div>
+        <div class="field">
+          <label for="endTime">Selesai</label>
+          <input id="endTime" type="time" value="08:00" required>
+        </div>
+        <div class="field full">
+          <label for="subject">Mata pelajaran</label>
+          <input id="subject" placeholder="Contoh: Matematika" maxlength="70" required>
+        </div>
+        <div class="field full">
+          <label for="teacher">Nama guru</label>
+          <input id="teacher" placeholder="Contoh: Bu Rina (boleh dikosongkan)" maxlength="70">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-white" type="button" id="cancelBtn">Batal</button>
+        <button class="btn btn-pink" type="submit">♡ Simpan jadwal</button>
+      </div>
+    </form>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const STORAGE_KEY = "jadwal_ma_persi38_v1";
+    const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
+    const icons = ["📚", "🧮", "🧪", "🌏", "📝", "🎨", "💻", "🕌", "🗣️", "🔬"];
+    const starter = [
+      ["Senin","07:00","08:00","Matematika","Contoh Guru","X"],
+      ["Senin","08:00","09:00","Bahasa Indonesia","Contoh Guru","X"],
+      ["Senin","09:30","10:30","Bahasa Inggris","Contoh Guru","X"],
+      ["Senin","10:30","11:30","Sejarah Indonesia","Contoh Guru","X"],
+      ["Selasa","07:00","08:00","Al-Qur'an Hadis","Contoh Guru","X"],
+      ["Selasa","08:00","09:00","Biologi","Contoh Guru","X"],
+      ["Selasa","09:30","10:30","Bahasa Arab","Contoh Guru","X"],
+      ["Selasa","10:30","11:30","PPKn","Contoh Guru","X"],
+      ["Rabu","07:00","08:00","Fisika","Contoh Guru","X"],
+      ["Rabu","08:00","09:00","Matematika","Contoh Guru","X"],
+      ["Rabu","09:30","10:30","Akidah Akhlak","Contoh Guru","X"],
+      ["Rabu","10:30","11:30","PJOK","Contoh Guru","X"],
+      ["Kamis","07:00","08:00","Kimia","Contoh Guru","X"],
+      ["Kamis","08:00","09:00","Fikih","Contoh Guru","X"],
+      ["Kamis","09:30","10:30","Bahasa Indonesia","Contoh Guru","X"],
+      ["Kamis","10:30","11:30","Informatika","Contoh Guru","X"],
+      ["Jumat","07:00","08:00","Sejarah Kebudayaan Islam","Contoh Guru","X"],
+      ["Jumat","08:00","09:00","Ekonomi","Contoh Guru","X"],
+      ["Jumat","09:30","10:30","Bahasa Inggris","Contoh Guru","X"]
+    ].map((r,i)=>({id: i+1, day:r[0], start:r[1], end:r[2], subject:r[3], teacher:r[4], className:r[5]}));
+
+    let schedules = loadSchedules();
+    let selectedDay = getTodayName();
+    let editingId = null;
+
+    const $ = id => document.getElementById(id);
+    function loadSchedules() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : starter.map(x=>({...x}));
+      } catch { return starter.map(x=>({...x})); }
+    }
+    function persist() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(schedules)); }
+      catch { showToast("Penyimpanan browser tidak tersedia."); }
+    }
+    function getTodayName() {
+      const map = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+      const d = map[new Date().getDay()];
+      return days.includes(d) ? d : "Senin";
+    }
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+    }
+    function render() {
+      $("todayDate").textContent = "📅 " + new Intl.DateTimeFormat("id-ID", {day:"numeric", month:"long", year:"numeric"}).format(new Date());
+      document.querySelectorAll(".day-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.day === selectedDay));
+      $("selectedDayTitle").textContent = ({"Senin":"🌸","Selasa":"🫧","Rabu":"🌈","Kamis":"🦋","Jumat":"☁️"}[selectedDay]) + " Jadwal Hari " + selectedDay;
+      const query = $("searchInput").value.trim().toLowerCase();
+      const classFilter = $("classFilter").value;
+      const rows = schedules.filter(s => s.day === selectedDay &&
+        (!classFilter || s.className === classFilter) &&
+        [s.subject,s.teacher,s.className,s.start,s.end].some(v => String(v).toLowerCase().includes(query))
+      ).sort((a,b)=>a.start.localeCompare(b.start));
+      $("scheduleCount").textContent = rows.length + (rows.length === 1 ? " pelajaran" : " pelajaran");
+      $("scheduleBody").innerHTML = rows.map((s,i)=>`
+        <tr>
+          <td class="time">${escapeHTML(s.start)} – ${escapeHTML(s.end)}</td>
+          <td><div class="subject"><span class="subject-icon">${icons[(s.subject.length+i)%icons.length]}</span><span>${escapeHTML(s.subject)}</span></div></td>
+          <td>${escapeHTML(s.teacher || "—")}</td>
+          <td><span class="class-tag">Kelas ${escapeHTML(s.className)}</span></td>
+          <td><button class="btn btn-white edit-btn" data-id="${s.id}" aria-label="Edit ${escapeHTML(s.subject)}">✏️</button> <button class="btn btn-white delete-btn" data-id="${s.id}" aria-label="Hapus ${escapeHTML(s.subject)}">🗑️</button></td>
+        </tr>`).join("");
+      $("emptyState").hidden = rows.length > 0;
+    }
+    function showToast(message) {
+      const toast = $("toast"); toast.textContent = message; toast.classList.add("show");
+      clearTimeout(showToast.timer); showToast.timer = setTimeout(()=>toast.classList.remove("show"), 2600);
+    }
+    function openModal(item=null) {
+      editingId = item ? item.id : null;
+      $("modalTitle").textContent = item ? "🪄 Edit jadwal" : "✨ Tambah jadwal";
+      $("day").value = item?.day || selectedDay;
+      $("className").value = item?.className || $("classFilter").value || "X";
+      $("startTime").value = item?.start || "07:00";
+      $("endTime").value = item?.end || "08:00";
+      $("subject").value = item?.subject || "";
+      $("teacher").value = item?.teacher === "Contoh Guru" ? "" : (item?.teacher || "");
+      $("modalBackdrop").classList.add("show");
+      $("subject").focus();
+    }
+    function closeModal() { $("modalBackdrop").classList.remove("show"); }
+    document.querySelectorAll(".day-btn").forEach(btn => btn.addEventListener("click",()=>{
+      selectedDay = btn.dataset.day; render();
+    }));
+    $("searchInput").addEventListener("input", render);
+    $("classFilter").addEventListener("change", render);
+    $("addBtn").addEventListener("click",()=>openModal());
+    $("cancelBtn").addEventListener("click",closeModal);
+    $("modalBackdrop").addEventListener("click",e=>{if(e.target === $("modalBackdrop")) closeModal();});
+    $("printBtn").addEventListener("click",()=>window.print());
+    $("resetBtn").addEventListener("click",()=>{
+      if(confirm("Kembalikan ke jadwal contoh? Jadwal yang kamu ubah akan diganti.")) {
+        schedules = starter.map(x=>({...x})); persist(); render(); showToast("Jadwal contoh berhasil dipulihkan 🌷");
+      }
+    });
+    $("scheduleBody").addEventListener("click",e=>{
+      const edit = e.target.closest(".edit-btn"), del = e.target.closest(".delete-btn");
+      if(edit) {
+        const item = schedules.find(s=>s.id === Number(edit.dataset.id));
+        if(item) openModal(item);
+      }
+      if(del) {
+        const item = schedules.find(s=>s.id === Number(del.dataset.id));
+        if(item && confirm(`Hapus jadwal "${item.subject}"?`)) {
+          schedules = schedules.filter(s=>s.id !== item.id); persist(); render(); showToast("Jadwal dihapus 🫧");
+        }
+      }
+    });
+    $("scheduleForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      const start = $("startTime").value, end = $("endTime").value;
+      if(start >= end) { showToast("Jam selesai harus setelah jam mulai, ya!"); $("endTime").focus(); return; }
+      const item = {
+        id: editingId ?? (schedules.reduce((max,s)=>Math.max(max,Number(s.id)||0),0)+1),
+        day: $("day").value, className: $("className").value, start, end,
+        subject: $("subject").value.trim(), teacher: $("teacher").value.trim()
+      };
+      if(!item.subject) { $("subject").focus(); return; }
+      if(editingId !== null) schedules = schedules.map(s=>s.id===editingId ? item : s);
+      else schedules.push(item);
+      selectedDay = item.day; persist(); closeModal(); render();
+      showToast(editingId !== null ? "Jadwal berhasil diperbarui 💗" : "Jadwal berhasil ditambahkan 🩵");
+    });
+    document.addEventListener("keydown",e=>{if(e.key==="Escape") closeModal();});
+    render();
+  </script>
+</body>
+</html>
